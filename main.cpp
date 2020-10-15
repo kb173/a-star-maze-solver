@@ -36,8 +36,8 @@ Maze solve_maze(const Maze &maze) {
         std::pop_heap(nodes.begin(), nodes.end(), [](MazeNode n1, MazeNode n2){return n1.priority > n2.priority;});
         nodes.pop_back();
 
-        int current_x = best.v[0];
-        int current_y = best.v[1];
+        uint current_x = best.v[0];
+        uint current_y = best.v[1];
         std::vector<uint> here = std::vector<uint>{current_x, current_y};
 
         // Are we done?
