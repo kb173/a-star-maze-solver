@@ -30,7 +30,7 @@ Maze solve_maze(const Maze &maze) {
 
     costs[std::vector<uint>{1, 1}] = 1;
 
-    for (int i = 0; i < 270; i++) {
+    while(true) {
         // Get the best node
         MazeNode best = nodes.front();
         std::pop_heap(nodes.begin(), nodes.end(), [](MazeNode n1, MazeNode n2){return n1.priority > n2.priority;});
@@ -40,12 +40,18 @@ Maze solve_maze(const Maze &maze) {
         int current_y = best.v[1];
         std::vector<uint> here = std::vector<uint>{current_x, current_y};
 
-        result.data[current_y][current_x] = 'P';
+        // Are we done?
+        if (current_x == 39 && current_y == 39) {
+            std::vector<uint> parent = here;
 
-        std::cout << i << ": " << current_x << ", " << current_y << " with " << " and priority " << best.priority << std::endl;
+            while (true) {
+                result.data[parent[1]][parent[0]] = 'o';
 
-        // The cost is the travelled distance to the next node
-        uint cost = costs[here] + 1;
+                if (parents.find(parent) == parents.end()) break;
+                parent = parents[parent];
+            }
+            return result;
+        }
 
         for (int kernel_y = -1; kernel_y <= 1; kernel_y++) {
             for (int kernel_x = -1; kernel_x <= 1; kernel_x++) {
@@ -58,19 +64,15 @@ Maze solve_maze(const Maze &maze) {
                 // Can we go here?
                 if (maze.data[y][x] == '#') continue;
 
-                // Are we done?
-                if (x == 39 && y == 39) {
-                    return result;
-                }
-
                 std::vector<uint> next = std::vector<uint>{x, y};
+
+                // The cost is the travelled distance to the next node
+                uint cost = costs[here] + abs(kernel_y) + abs(kernel_x);
 
                 // If this node hasn't been added yet or its costs are better, add it!
                 if (costs.find(next) == costs.end() || cost < costs[next]) {
                     costs[next] = cost;
                     uint priority = cost + (39 - x) + (39 - y);
-
-                    std::cout << x << ", " << y << ": Adding node with priority " << priority << std::endl;
 
                     // Add this node
                     nodes.push_back(MazeNode(next, priority));
